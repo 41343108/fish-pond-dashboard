@@ -4,6 +4,7 @@ import NodeCard from "@/components/cards/NodeCard";
 import Header from "@/components/layout/Header";
 import AutoRefresh from "@/components/AutoRefresh";
 import { supabase } from "@/lib/supabase";
+import HistoryViewer from "@/components/HistoryViewer";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -96,6 +97,7 @@ export default async function Home() {
         <section className="mt-8">
           <TemperatureChart />
         </section>
+        <HistoryViewer />
 
         <section className="mt-6 text-sm text-slate-400">
           <p>
