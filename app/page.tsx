@@ -32,6 +32,19 @@ const node02 = latestByNode.get("Node02");
 const node03 = latestByNode.get("Node03");
 const node04 = latestByNode.get("Node04");
 
+function getNodeStatus(nodeData: any): "ONLINE" | "OFFLINE" {
+  if (!nodeData?.created_at) {
+    return "OFFLINE";
+  }
+
+  const lastUpdate = new Date(nodeData.created_at).getTime();
+  const now = Date.now();
+
+  const diffMinutes = (now - lastUpdate) / 1000 / 60;
+
+  return diffMinutes <= 2 ? "ONLINE" : "OFFLINE";
+}
+
   return (
     <main className="min-h-screen bg-slate-950 p-4 text-white sm:p-6">
       <AutoRefresh />
@@ -45,31 +58,63 @@ const node04 = latestByNode.get("Node04");
   temperature={node01?.air_temp ?? null}
   humidity={node01?.humidity ?? null}
   battery={node01?.battery ?? null}
-  status={node01 ? "ONLINE" : "OFFLINE"}
+  status={getNodeStatus(node01)}
+/>
+
+<NodeCard
+  node="Node01"
+  temperature={
+    getNodeStatus(node01) === "ONLINE" ? node01?.air_temp ?? null : null
+  }
+  humidity={
+    getNodeStatus(node01) === "ONLINE" ? node01?.humidity ?? null : null
+  }
+  battery={
+    getNodeStatus(node01) === "ONLINE" ? node01?.battery ?? null : null
+  }
+  status={getNodeStatus(node01)}
 />
 
 <NodeCard
   node="Node02"
-  temperature={node02?.air_temp ?? null}
-  humidity={node02?.humidity ?? null}
-  battery={node02?.battery ?? null}
-  status={node02 ? "ONLINE" : "OFFLINE"}
+  temperature={
+    getNodeStatus(node02) === "ONLINE" ? node02?.air_temp ?? null : null
+  }
+  humidity={
+    getNodeStatus(node02) === "ONLINE" ? node02?.humidity ?? null : null
+  }
+  battery={
+    getNodeStatus(node02) === "ONLINE" ? node02?.battery ?? null : null
+  }
+  status={getNodeStatus(node02)}
 />
 
 <NodeCard
   node="Node03"
-  temperature={node03?.air_temp ?? null}
-  humidity={node03?.humidity ?? null}
-  battery={node03?.battery ?? null}
-  status={node03 ? "ONLINE" : "OFFLINE"}
+  temperature={
+    getNodeStatus(node03) === "ONLINE" ? node03?.air_temp ?? null : null
+  }
+  humidity={
+    getNodeStatus(node03) === "ONLINE" ? node03?.humidity ?? null : null
+  }
+  battery={
+    getNodeStatus(node03) === "ONLINE" ? node03?.battery ?? null : null
+  }
+  status={getNodeStatus(node03)}
 />
 
 <NodeCard
   node="Node04"
-  temperature={node04?.air_temp ?? null}
-  humidity={node04?.humidity ?? null}
-  battery={node04?.battery ?? null}
-  status={node04 ? "ONLINE" : "OFFLINE"}
+  temperature={
+    getNodeStatus(node04) === "ONLINE" ? node04?.air_temp ?? null : null
+  }
+  humidity={
+    getNodeStatus(node04) === "ONLINE" ? node04?.humidity ?? null : null
+  }
+  battery={
+    getNodeStatus(node04) === "ONLINE" ? node04?.battery ?? null : null
+  }
+  status={getNodeStatus(node04)}
 />
         </div>
 
