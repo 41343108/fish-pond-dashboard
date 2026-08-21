@@ -49,6 +49,7 @@ export default function HistoryViewer() {
 
   const [rows, setRows] = useState<SensorRow[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedHour, setSelectedHour] = useState<number | null>(null);
 
   useEffect(() => {
     async function loadHistory() {
@@ -126,6 +127,44 @@ export default function HistoryViewer() {
     }));
   }, [rows]);
 
+  const minuteData = useMemo(() => {
+  if (selectedHour === null) return [];
+
+  const buckets = Array.from({ length: 60 }, (_, minute) => ({
+    minute: String(minute).padStart(2, "0"),
+    tempTotal: 0,
+    tempCount: 0,
+  }));
+
+  for (const row of rows) {
+    const taiwanTime = new Date(
+      new Date(row.created_at).toLocaleString("en-US", {
+        timeZone: "Asia/Taipei",
+      })
+    );
+
+    if (taiwanTime.getHours() !== selectedHour) {
+      continue;
+    }
+
+    const minute = taiwanTime.getMinutes();
+
+    if (row.air_temp !== null) {
+      buckets[minute].tempTotal += row.air_temp;
+      buckets[minute].tempCount += 1;
+    }
+  }
+
+  return buckets.map((bucket) => ({
+    minute: bucket.minute,
+    temperature:
+      bucket.tempCount > 0
+        ? Number((bucket.tempTotal / bucket.tempCount).toFixed(1))
+        : null,
+    count: bucket.tempCount,
+  }));
+}, [rows, selectedHour]);
+
   return (
     <section className="mt-8">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -201,8 +240,23 @@ export default function HistoryViewer() {
             {hourlyData.map((item) => (
               <tr
                 key={item.hour}
-                className="border-b border-slate-800/60"
-              >
+                onClick={() => {
+                    const hour = Number(item.hour.slice(0, 2));
+
+                    if (item.count > 0) {
+                        setSelectedHour(hour);
+                    }
+                 }}
+                className={`border-b border-slate-800/60 ${
+                    item.count > 0
+                    ? "cursor-pointer hover:bg-slate-800/50"
+                    : ""
+                } ${
+                    selectedHour === Number(item.hour.slice(0, 2))
+                        ? "bg-slate-800/70"
+                        : ""
+                    }`}
+                >
                 <td className="px-4 py-3">{item.hour}</td>
 
                 <td className="px-4 py-3">
@@ -223,6 +277,78 @@ export default function HistoryViewer() {
           </tbody>
         </table>
       </div>
+            {selectedHour !== null && (
+        <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-5">
+            <div className="mb-4">
+            <h3 className="text-lg font-semibold">
+                一小時 60 分鐘溫度變化
+            </h3>
+
+            <p className="text-sm text-slate-400">
+                {selectedDate}{" "}
+                {String(selectedHour).padStart(2, "0")}:00 ～{" "}
+                {String(selectedHour).padStart(2, "0")}:59
+            </p>
+
+            <p className="mt-1 text-sm text-slate-500">
+                測試期間同一分鐘若有多筆資料，會自動計算該分鐘平均溫度
+            </p>
+            </div>
+
+            <div className="h-[360px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={minuteData}>
+                <CartesianGrid strokeDasharray="3 3" />
+
+                <XAxis
+                    dataKey="minute"
+                    interval={4}
+                    tickFormatter={(value) => `${value}分`}
+                />
+
+                <YAxis unit="°C" />
+
+                <Tooltip
+                    labelFormatter={(value) =>
+                    `${String(selectedHour).padStart(2, "0")}:${value}`
+                    }
+                />
+
+                <Line
+                    type="monotone"
+                    dataKey="temperature"
+                    name="平均溫度"
+                    unit="°C"
+                    connectNulls={false}
+                />
+                </LineChart>
+            </ResponsiveContainer>
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+            {minuteData
+                .filter((item) => item.temperature !== null)
+                .map((item) => (
+                <div
+                    key={item.minute}
+                    className="rounded-lg bg-slate-800 p-3"
+                >
+                    <div className="text-xs text-slate-400">
+                    {String(selectedHour).padStart(2, "0")}:{item.minute}
+                    </div>
+
+                    <div className="mt-1 font-semibold text-cyan-400">
+                    {item.temperature}°C
+                    </div>
+
+                    <div className="text-xs text-slate-500">
+                    {item.count} 筆
+                    </div>
+                </div>
+                ))}
+            </div>
+        </div>
+        )}
     </section>
   );
 }
