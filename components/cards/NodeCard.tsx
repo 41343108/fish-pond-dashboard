@@ -1,8 +1,8 @@
 type NodeCardProps = {
   node: string;
-  temperature: number;
-  humidity: number;
-  battery: number;
+  temperature: number | null;
+  humidity: number | null;
+  battery: number | null;
   status: "ONLINE" | "OFFLINE";
 };
 
@@ -34,23 +34,38 @@ export default function NodeCard({
       <div className="mt-5 grid grid-cols-3 gap-3">
 
         <div className="rounded-xl bg-slate-800 p-3">
-          <p className="text-xs text-slate-400">溫度</p>
+          <p className="text-xs text-slate-400">
+            溫度
+          </p>
+
           <p className="mt-1 text-xl font-bold text-cyan-300">
-            {temperature}°C
+            {temperature !== null
+              ? `${temperature.toFixed(1)}°C`
+              : "--"}
           </p>
         </div>
 
         <div className="rounded-xl bg-slate-800 p-3">
-          <p className="text-xs text-slate-400">濕度</p>
+          <p className="text-xs text-slate-400">
+            濕度
+          </p>
+
           <p className="mt-1 text-xl font-bold text-cyan-300">
-            {humidity}%
+            {humidity !== null
+              ? `${humidity.toFixed(1)}%`
+              : "--"}
           </p>
         </div>
 
         <div className="rounded-xl bg-slate-800 p-3">
-          <p className="text-xs text-slate-400">電池</p>
+          <p className="text-xs text-slate-400">
+            電池
+          </p>
+
           <p className="mt-1 text-xl font-bold text-yellow-300">
-            {battery}%
+            {battery !== null
+              ? `${battery.toFixed(0)}%`
+              : "--"}
           </p>
         </div>
 

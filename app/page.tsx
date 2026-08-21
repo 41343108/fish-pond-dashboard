@@ -10,17 +10,27 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function Home() {
-  const { data, error } = await supabase
-    .from("sensor_data")
-    .select("*")
-    .eq("node", "Node01")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .single();
+  const { data: rows, error } = await supabase
+  .from("sensor_data")
+  .select("*")
+  .in("node", ["Node01", "Node02", "Node03", "Node04"])
+  .order("created_at", { ascending: false });
 
   if (error) {
     console.error("Supabase error:", error);
   }
+  const latestByNode = new Map();
+
+for (const row of rows ?? []) {
+  if (!latestByNode.has(row.node)) {
+    latestByNode.set(row.node, row);
+  }
+}
+
+const node01 = latestByNode.get("Node01");
+const node02 = latestByNode.get("Node02");
+const node03 = latestByNode.get("Node03");
+const node04 = latestByNode.get("Node04");
 
   return (
     <main className="min-h-screen bg-slate-950 p-4 text-white sm:p-6">
@@ -31,36 +41,36 @@ export default async function Home() {
 
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <NodeCard
-            node="Node01"
-            temperature={data?.air_temp ?? 0}
-            humidity={data?.humidity ?? 0}
-            battery={data?.battery ?? 0}
-            status={data ? "ONLINE" : "OFFLINE"}
-          />
+  node="Node01"
+  temperature={node01?.air_temp ?? null}
+  humidity={node01?.humidity ?? null}
+  battery={node01?.battery ?? null}
+  status={node01 ? "ONLINE" : "OFFLINE"}
+/>
 
-          <NodeCard
-            node="Node02"
-            temperature={30.2}
-            humidity={74}
-            battery={87}
-            status="OFFLINE"
-          />
+<NodeCard
+  node="Node02"
+  temperature={node02?.air_temp ?? null}
+  humidity={node02?.humidity ?? null}
+  battery={node02?.battery ?? null}
+  status={node02 ? "ONLINE" : "OFFLINE"}
+/>
 
-          <NodeCard
-            node="Node03"
-            temperature={28.9}
-            humidity={81}
-            battery={94}
-            status="OFFLINE"
-          />
+<NodeCard
+  node="Node03"
+  temperature={node03?.air_temp ?? null}
+  humidity={node03?.humidity ?? null}
+  battery={node03?.battery ?? null}
+  status={node03 ? "ONLINE" : "OFFLINE"}
+/>
 
-          <NodeCard
-            node="Node04"
-            temperature={31.4}
-            humidity={70}
-            battery={76}
-            status="OFFLINE"
-          />
+<NodeCard
+  node="Node04"
+  temperature={node04?.air_temp ?? null}
+  humidity={node04?.humidity ?? null}
+  battery={node04?.battery ?? null}
+  status={node04 ? "ONLINE" : "OFFLINE"}
+/>
         </div>
 
         <section className="mt-8">
@@ -70,27 +80,27 @@ export default async function Home() {
 
           <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
             <WaterCard
-              title="水溫"
-              value={data?.water_temp?.toString() ?? "--"}
-              unit="°C"
-            />
+  title="水溫"
+  value={node01?.water_temp?.toString() ?? "--"}
+  unit="°C"
+/>
 
-            <WaterCard
-              title="pH"
-              value={data?.ph?.toString() ?? "--"}
-            />
+<WaterCard
+  title="pH"
+  value={node01?.ph?.toString() ?? "--"}
+/>
 
-            <WaterCard
-              title="EC"
-              value={data?.ec?.toString() ?? "--"}
-              unit="μS/cm"
-            />
+<WaterCard
+  title="EC"
+  value={node01?.ec?.toString() ?? "--"}
+  unit="μS/cm"
+/>
 
-            <WaterCard
-              title="TDS"
-              value={data?.tds?.toString() ?? "--"}
-              unit="ppm"
-            />
+<WaterCard
+  title="TDS"
+  value={node01?.tds?.toString() ?? "--"}
+  unit="ppm"
+/>
           </div>
         </section>
 
@@ -106,11 +116,11 @@ export default async function Home() {
 
           <p>
             最後更新：
-            {data?.created_at
-              ? new Date(data.created_at).toLocaleString("zh-TW", {
-                  timeZone: "Asia/Taipei",
-                })
-              : "尚無資料"}
+            {node01?.created_at
+  ? new Date(node01.created_at).toLocaleString("zh-TW", {
+      timeZone: "Asia/Taipei",
+    })
+  : "尚無資料"}
           </p>
         </section>
       </div>
