@@ -53,13 +53,7 @@ function getNodeStatus(nodeData: any): "ONLINE" | "OFFLINE" {
         <Header />
 
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <NodeCard
-  node="Node01"
-  temperature={node01?.air_temp ?? null}
-  humidity={node01?.humidity ?? null}
-  battery={node01?.battery ?? null}
-  status={getNodeStatus(node01)}
-/>
+
 
 <NodeCard
   node="Node01"
