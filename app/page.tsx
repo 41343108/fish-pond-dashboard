@@ -2,9 +2,11 @@ import TemperatureChart from "@/components/charts/TemperatureChart";
 import WaterCard from "@/components/cards/WaterCard";
 import NodeCard from "@/components/cards/NodeCard";
 import Header from "@/components/layout/Header";
+import AutoRefresh from "@/components/AutoRefresh";
 import { supabase } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function Home() {
   const { data, error } = await supabase
@@ -21,6 +23,8 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-slate-950 p-4 text-white sm:p-6">
+      <AutoRefresh />
+
       <div className="mx-auto max-w-7xl">
         <Header />
 
